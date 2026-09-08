@@ -32,3 +32,39 @@ services:
         fromDatabase:
           name: sukyo-db
           property: password
+
+          databases:
+  - name: sukyo-db
+    plan: free
+    postgresMajorVersion: 16
+
+services:
+  - type: web
+    name: sukyo-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: sukyo-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sukyo-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: sukyo-db
+          property: database
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sukyo-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sukyo-db
+          property: password
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+
