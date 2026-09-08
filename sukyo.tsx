@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-/* API 서버 주소 - 로컬 실행 시 기본값, 배포 후에는 실제 도메인으로 교체 */
+/* API 서버 주소
+   - 로컬 개발: http://localhost:8080 (기본값)
+   - Render 배포 후: https://[서비스이름].onrender.com 로 이 줄만 교체 */
 const API_BASE_URL = "http://localhost:8080";
 
 /* ────────────────────────────────────────────────────────────
