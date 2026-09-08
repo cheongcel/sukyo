@@ -4,8 +4,6 @@ server:
 spring:
   application:
     name: sukyo-backend
-  profiles:
-    active: local
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,23 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/sukyo
-    username: sukyo
-    password: sukyo
-
----
-spring:
-  config:
-    activate:
-      on-profile: docker
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:sukyo}
-    username: ${DB_USER:sukyo}
-    password: ${DB_PASSWORD:sukyo}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sukyo}
+    username: ${SPRING_DATASOURCE_USERNAME:sukyo}
+    password: ${SPRING_DATASOURCE_PASSWORD:sukyo}
