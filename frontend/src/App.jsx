@@ -388,7 +388,7 @@ const css = `
   .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
 
   .date-row { display: flex; gap: 8px; width: 100%; margin-bottom: 8px; }
-  .date-input { flex: 2; background: #fafafa; border: 1px solid var(--border); color: var(--ink); padding: 13px 10px; font-size: 14px; border-radius: 8px; text-align: center; }
+  .date-input { flex: 2; background: #fafafa; border: 1px solid var(--border); color: var(--ink); padding: 13px 10px; font-size: 16px; border-radius: 8px; text-align: center; }
   .date-input.short { flex: 1; }
   .error-text { color: var(--pink); font-size: 12.5px; margin: 8px 0 16px; }
 
