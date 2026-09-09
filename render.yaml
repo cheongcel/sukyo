@@ -2,6 +2,7 @@ services:
   - type: web
     name: sukyo-backend
     runtime: docker
+    region: singapore
     dockerfilePath: ./Dockerfile
     plan: free
     envVars:
