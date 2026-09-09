@@ -333,7 +333,21 @@ const css = `
     background: #ffffff;
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif;
-    min-height: 100%;
+    min-height: 100vh;
+  }
+  @media (min-width: 480px) {
+    .app {
+      background: var(--pink-soft);
+      display: flex;
+      justify-content: center;
+      padding: 32px 12px;
+    }
+    .screen {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(224, 81, 125, 0.08);
+      padding-top: 40px;
+    }
   }
   .screen {
     max-width: 420px;
