@@ -36,19 +36,13 @@ public class Star {
     private String directionGroup; // 동방청룡 / 북방현무 / 서방백호 / 남방주작
     private String keyword;   // 한 줄 요약 키워드
 
-    // 01~07 상세 카피. 아직 작성되지 않은 수는 null로 두고 프론트에서 placeholder 처리.
+    // 무료 콘텐츠
     @Column(columnDefinition = "TEXT")
     private String catchPhrase;
     @Column(columnDefinition = "TEXT")
-    private String temperament;
+    private String temperament; // 개인 성향
     @Column(columnDefinition = "TEXT")
-    private String love;
+    private String love;        // 연애 성향
     @Column(columnDefinition = "TEXT")
-    private String work;
-    @Column(columnDefinition = "TEXT")
-    private String money;
-    @Column(columnDefinition = "TEXT")
-    private String duality;
-    @Column(columnDefinition = "TEXT")
-    private String power;
+    private String hookQuestion; // 왜 OO는 ~할까요? (심층 리포트 유도용)
 }
