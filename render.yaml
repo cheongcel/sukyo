@@ -1,8 +1,12 @@
+databases:
+  - name: sukyo-db
+    plan: free
+    postgresMajorVersion: 16
+
 services:
   - type: web
     name: sukyo-backend
     runtime: docker
-    region: singapore
     dockerfilePath: ./Dockerfile
     plan: free
     envVars:
