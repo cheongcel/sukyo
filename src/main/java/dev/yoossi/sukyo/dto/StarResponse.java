@@ -12,15 +12,11 @@ public class StarResponse {
     private String element;
     private String animal;
     private String directionGroup;
-    private String keyword;
-    private boolean profileReady; // 01~07 카피가 준비된 수인지
+    private boolean profileReady; // 콘텐츠가 준비된 수인지
     private String catchPhrase;
-    private String temperament;
-    private String love;
-    private String work;
-    private String money;
-    private String duality;
-    private String power;
+    private String temperament;   // 개인 성향 (무료)
+    private String love;          // 연애 성향 (무료)
+    private String hookQuestion;  // 심층 리포트 유도 문구
 
     public static StarResponse from(Star star) {
         boolean ready = star.getTemperament() != null;
@@ -30,15 +26,11 @@ public class StarResponse {
             .element(star.getElement())
             .animal(star.getAnimal())
             .directionGroup(star.getDirectionGroup())
-            .keyword(star.getKeyword())
             .profileReady(ready)
             .catchPhrase(star.getCatchPhrase())
             .temperament(star.getTemperament())
             .love(star.getLove())
-            .work(star.getWork())
-            .money(star.getMoney())
-            .duality(star.getDuality())
-            .power(star.getPower())
+            .hookQuestion(star.getHookQuestion())
             .build();
     }
 }
