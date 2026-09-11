@@ -4,6 +4,68 @@ import { useState } from "react";
    예: https://sukyo-backend.onrender.com */
 const API_BASE_URL = "https://sukyo-backend.onrender.com";
 
+/* ── UI 문자열(한/영). 27수 콘텐츠 본문은 한국어 원고만 있어서 아직 번역 대상에서 제외했어요. ── */
+const STRINGS = {
+  ko: {
+    heroSub: "생년월일 하나로 보는 27수 성향 테스트",
+    body: "숙요점은 인도에서 비롯되어 불교와 함께 동아시아로 전해진 별자리 체계예요. 태어난 날 달이 머물던 하늘의 자리, 27수 중 하나가 평생의 기질과 인연의 결을 말해준다고 믿었습니다. 사주가 태어난 순간 전체의 기운을 본다면, 숙요점은 그날 밤 달이 어디에 있었는지 — 단 하나의 좌표에 집중해요.",
+    freeTag: "무료", freeLabel: "내 宿 결과",
+    paidTag: "1,900원", paidLabel: "궁합 리포트",
+    cta: "내 숙(宿) 확인하기",
+    faqQ1: "사주랑 뭐가 달라요?",
+    faqA1: "사주는 연·월·일·시 네 기둥을 모두 보지만, 숙요점은 태어난 날 달의 위치 단 하나로 사람을 읽어요. 태어난 시간을 몰라도 정확하게 볼 수 있어요.",
+    faqQ2: "27수는 어떻게 계산돼요?",
+    faqA2: "생년월일을 입력하면 그날 달의 황경을 계산해 27개 구간 중 어디에 해당하는지 판정해요. 태어난 시간과 무관하게 날짜만 있으면 됩니다.",
+    back: "← 뒤로", backHome: "← 처음으로", backResult: "← 내 결과로",
+    birthTitle: "생년월일 입력", birthSub: "양력 기준으로 입력해 주세요",
+    partnerTitle: "상대방 생년월일", partnerSub: "궁합을 확인할 상대의 생일을 입력해 주세요",
+    year: "년(YYYY)", month: "월", day: "일",
+    seeResult: "결과 보기", calculating: "계산 중...", seeCompat: "궁합 결과 보기",
+    personal: "개인 성향", love: "연애 성향",
+    deepCta: (name) => `내 ${name} 더 깊게 보기`,
+    compatCta: "우리 궁합은 어떨까?",
+    compatGroup: "궁합 관계",
+    oneLiner: "관계 한줄평",
+    startTitle: "끌림과 관계의 시작", romanceTitle: "연인으로 만나면",
+    conflictTitle: "갈등과 관계의 약점", legacyTitle: "이 관계가 남기는 것",
+    lockText: "전체 궁합 리포트는 1,900원에 확인할 수 있어요",
+    unlock: "리포트 잠금 해제",
+    errStar: "결과를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+    errCompat: "궁합을 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+    share: "결과 공유하기", shareCopied: "링크를 복사했어요",
+    charSlot: "캐릭터 이미지 자리", me: "나", partner: "상대",
+  },
+  en: {
+    heroSub: "Discover your 27-Star personality from just your birth date",
+    body: "Sukyojeom is a star-mansion system that traveled from India to East Asia along with Buddhism. It's believed the lunar mansion the moon rested in on the night you were born — one of 27 — reveals your lifelong temperament and the shape of your relationships. If saju reads the full energy of the moment you were born, Sukyojeom focuses on a single coordinate: where the moon was that night.",
+    freeTag: "Free", freeLabel: "My 宿 result",
+    paidTag: "$1.5", paidLabel: "Compatibility report",
+    cta: "Find my 宿",
+    faqQ1: "How is this different from Saju?",
+    faqA1: "Saju reads all four pillars — year, month, day, hour. Sukyojeom reads a single point: where the moon was on your birth date. You don't even need to know your birth time.",
+    faqQ2: "How is the 27-Star calculated?",
+    faqA2: "We calculate the moon's ecliptic longitude on your birth date and match it to one of 27 segments. Only the date matters — birth time isn't needed.",
+    back: "← Back", backHome: "← Home", backResult: "← My result",
+    birthTitle: "Enter your birth date", birthSub: "Please use the solar calendar",
+    partnerTitle: "Partner's birth date", partnerSub: "Enter your partner's birth date to check compatibility",
+    year: "Year", month: "Month", day: "Day",
+    seeResult: "See result", calculating: "Calculating...", seeCompat: "See compatibility",
+    personal: "Personality", love: "Love style",
+    deepCta: (name) => `Go deeper into ${name}`,
+    compatCta: "How do we match?",
+    compatGroup: "Compatibility",
+    oneLiner: "One-line summary",
+    startTitle: "How it starts", romanceTitle: "As a couple",
+    conflictTitle: "Where it breaks", legacyTitle: "What it leaves behind",
+    lockText: "Unlock the full compatibility report for $1.5",
+    unlock: "Unlock report",
+    errStar: "Couldn't load your result. Please try again.",
+    errCompat: "Couldn't load compatibility. Please try again.",
+    share: "Share result", shareCopied: "Link copied",
+    charSlot: "Character image slot", me: "Me", partner: "Partner",
+  },
+};
+
 async function fetchStar(y, m, d) {
   const res = await fetch(`${API_BASE_URL}/api/sukyo/star`, {
     method: "POST",
@@ -27,11 +89,47 @@ async function fetchCompatibility(me, partner) {
   return res.json();
 }
 
+async function shareResult(title, text, t, setToast) {
+  const url = window.location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+    } catch (e) {
+      /* 사용자가 취소한 경우 등은 무시 */
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(url);
+      setToast(t.shareCopied);
+      setTimeout(() => setToast(""), 1800);
+    } catch (e) {
+      /* clipboard 접근 실패 시 조용히 무시 */
+    }
+  }
+}
+
+function LangToggle({ lang, setLang }) {
+  return (
+    <div className="lang-toggle">
+      <button className={lang === "ko" ? "active" : ""} onClick={() => setLang("ko")}>KR</button>
+      <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>EN</button>
+    </div>
+  );
+}
+
+function ShareButton({ onClick, label }) {
+  return (
+    <button className="share-btn" onClick={onClick} aria-label={label}>
+      ⤴ {label}
+    </button>
+  );
+}
+
 function CharacterSlot({ label }) {
   return (
     <div className="char-slot">
       <span className="char-slot-plus">＋</span>
-      <span className="char-slot-text">{label || "캐릭터 이미지 자리"}</span>
+      <span className="char-slot-text">{label}</span>
     </div>
   );
 }
@@ -52,6 +150,9 @@ export default function App() {
   const [screen, setScreen] = useState("landing");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [lang, setLang] = useState("ko");
+  const [toast, setToast] = useState("");
+  const t = STRINGS[lang];
 
   const [birth, setBirth] = useState({ y: "", m: "", d: "" });
   const [partnerBirth, setPartnerBirth] = useState({ y: "", m: "", d: "" });
@@ -71,7 +172,7 @@ export default function App() {
       setStar(data);
       setScreen("result");
     } catch (e) {
-      setError("결과를 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      setError(t.errStar);
     } finally {
       setLoading(false);
     }
@@ -86,7 +187,7 @@ export default function App() {
       setUnlocked(false);
       setScreen("compat-result");
     } catch (e) {
-      setError("궁합을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      setError(t.errCompat);
     } finally {
       setLoading(false);
     }
@@ -95,52 +196,42 @@ export default function App() {
   return (
     <div className="app">
       <style>{css}</style>
+      {toast && <div className="toast">{toast}</div>}
 
       {screen === "landing" && (
         <div className="screen">
+          <div className="landing-lang-wrap">
+            <LangToggle lang={lang} setLang={setLang} />
+          </div>
           <div className="mark">宿</div>
           <h1 className="hero-title">숙요점</h1>
-          <p className="hero-sub">생년월일 하나로 보는 27수 성향 테스트</p>
+          <p className="hero-sub">{t.heroSub}</p>
 
-          <p className="body-text">
-            숙요점은 인도에서 비롯되어 불교와 함께 동아시아로 전해진 별자리
-            체계예요. 태어난 날 달이 머물던 하늘의 자리, 27수 중 하나가
-            평생의 기질과 인연의 결을 말해준다고 믿었습니다. 사주가 태어난
-            순간 전체의 기운을 본다면, 숙요점은 그날 밤 달이 어디에
-            있었는지 — 단 하나의 좌표에 집중해요.
-          </p>
+          <p className="body-text">{t.body}</p>
 
           <div className="pill-row">
             <div className="pill">
-              <div className="pill-tag">무료</div>
-              <div className="pill-label">내 宿 결과</div>
+              <div className="pill-tag">{t.freeTag}</div>
+              <div className="pill-label">{t.freeLabel}</div>
             </div>
             <div className="pill">
-              <div className="pill-tag">1,900원</div>
-              <div className="pill-label">궁합 리포트</div>
+              <div className="pill-tag">{t.paidTag}</div>
+              <div className="pill-label">{t.paidLabel}</div>
             </div>
           </div>
 
           <button className="cta" onClick={() => setScreen("birth")}>
-            내 숙(宿) 확인하기
+            {t.cta}
           </button>
 
           <div className="faq">
             <div className="faq-item">
-              <p className="faq-q">사주랑 뭐가 달라요?</p>
-              <p className="faq-a">
-                사주는 연·월·일·시 네 기둥을 모두 보지만, 숙요점은 태어난
-                날 달의 위치 단 하나로 사람을 읽어요. 태어난 시간을 몰라도
-                정확하게 볼 수 있어요.
-              </p>
+              <p className="faq-q">{t.faqQ1}</p>
+              <p className="faq-a">{t.faqA1}</p>
             </div>
             <div className="faq-item">
-              <p className="faq-q">27수는 어떻게 계산돼요?</p>
-              <p className="faq-a">
-                생년월일을 입력하면 그날 달의 황경을 계산해 27개 구간 중
-                어디에 해당하는지 판정해요. 태어난 시간과 무관하게 날짜만
-                있으면 됩니다.
-              </p>
+              <p className="faq-q">{t.faqQ2}</p>
+              <p className="faq-a">{t.faqA2}</p>
             </div>
           </div>
         </div>
@@ -148,30 +239,31 @@ export default function App() {
 
       {screen === "birth" && (
         <div className="screen">
-          <button className="back" onClick={() => setScreen("landing")}>
-            ← 뒤로
-          </button>
-          <h2 className="page-title">생년월일 입력</h2>
-          <p className="page-sub">양력 기준으로 입력해 주세요</p>
+          <div className="screen-top-row">
+            <button className="back" onClick={() => setScreen("landing")}>{t.back}</button>
+            <LangToggle lang={lang} setLang={setLang} />
+          </div>
+          <h2 className="page-title">{t.birthTitle}</h2>
+          <p className="page-sub">{t.birthSub}</p>
 
           <div className="date-row">
             <input
               className="date-input"
-              placeholder="년(YYYY)"
+              placeholder={t.year}
               inputMode="numeric"
               value={birth.y}
               onChange={(e) => setBirth({ ...birth, y: e.target.value })}
             />
             <input
               className="date-input short"
-              placeholder="월"
+              placeholder={t.month}
               inputMode="numeric"
               value={birth.m}
               onChange={(e) => setBirth({ ...birth, m: e.target.value })}
             />
             <input
               className="date-input short"
-              placeholder="일"
+              placeholder={t.day}
               inputMode="numeric"
               value={birth.d}
               onChange={(e) => setBirth({ ...birth, d: e.target.value })}
@@ -181,79 +273,76 @@ export default function App() {
           {error && <p className="error-text">{error}</p>}
 
           <button className="cta" disabled={!canSubmitBirth || loading} onClick={submitBirth}>
-            {loading ? "계산 중..." : "결과 보기"}
+            {loading ? t.calculating : t.seeResult}
           </button>
         </div>
       )}
 
       {screen === "result" && star && (
         <div className="screen">
-          <button className="back" onClick={() => setScreen("landing")}>
-            ← 처음으로
-          </button>
+          <div className="screen-top-row">
+            <button className="back" onClick={() => setScreen("landing")}>{t.backHome}</button>
+            <LangToggle lang={lang} setLang={setLang} />
+          </div>
 
           <div className="result-head">
             <span className="result-group">{star.directionGroup}</span>
             <h2 className="result-name">
               {star.koreanName} <span className="result-hanja">{star.hanja}</span>
             </h2>
-            <span className="result-tag">
-              {star.element} · {star.animal} · {star.keyword}
-            </span>
+            <span className="result-tag">{star.element} · {star.animal}</span>
           </div>
 
-          <CharacterSlot label={`${star.koreanName} 캐릭터 이미지 자리`} />
+          <CharacterSlot label={`${star.koreanName} ${t.charSlot}`} />
 
-          {star.profileReady ? (
-            <>
-              <p className="catchphrase">“{star.catchPhrase}”</p>
-              <Section n="02" title="기본 기질">{star.temperament}</Section>
-              <Section n="03" title="연애 성향">{star.love}</Section>
-              <Section n="04" title="일">{star.work}</Section>
-              <Section n="05" title="재물">{star.money}</Section>
-              <Section n="06" title="겉과 속">{star.duality}</Section>
-              <Section n="07" title="이 별의 힘">{star.power}</Section>
-            </>
-          ) : (
-            <div className="placeholder-note">
-              {star.koreanName}의 상세 해설은 준비 중이에요. 지금은 {star.element}
-              ·{star.animal} 기운을 가진 “{star.keyword}”의 별이라는 점만 확인할 수
-              있어요.
-            </div>
-          )}
+          <p className="catchphrase">“{star.catchPhrase}”</p>
+
+          <Section n="01" title={t.personal}>{star.temperament}</Section>
+          <Section n="02" title={t.love}>{star.love}</Section>
+
+          <div className="hook-box">
+            <p className="hook-text">{star.hookQuestion}</p>
+            <button className="cta outline small-full">{t.deepCta(star.koreanName)}</button>
+          </div>
+
+          <ShareButton
+            label={t.share}
+            onClick={() => shareResult("숙요점", `나는 ${star.koreanName}(${star.hanja})예요 — ${star.catchPhrase}`, t, setToast)}
+          />
 
           <button className="cta outline" onClick={() => setScreen("compat-input")}>
-            우리 궁합은 어떨까?
+            {t.compatCta}
           </button>
         </div>
       )}
 
       {screen === "compat-input" && (
         <div className="screen">
-          <button className="back" onClick={() => setScreen("result")}>
-            ← 뒤로
-          </button>
-          <h2 className="page-title">상대방 생년월일</h2>
-          <p className="page-sub">궁합을 확인할 상대의 생일을 입력해 주세요</p>
+          <div className="screen-top-row">
+            <button className="back" onClick={() => setScreen("result")}>{t.back}</button>
+            <LangToggle lang={lang} setLang={setLang} />
+          </div>
+          <h2 className="page-title">{t.partnerTitle}</h2>
+          <p className="page-sub">{t.partnerSub}</p>
 
           <div className="date-row">
             <input
               className="date-input"
-              placeholder="년(YYYY)"
+              placeholder={t.year}
               inputMode="numeric"
               value={partnerBirth.y}
               onChange={(e) => setPartnerBirth({ ...partnerBirth, y: e.target.value })}
             />
             <input
               className="date-input short"
-              placeholder="월"
+              placeholder={t.month}
               inputMode="numeric"
               value={partnerBirth.m}
               onChange={(e) => setPartnerBirth({ ...partnerBirth, m: e.target.value })}
             />
             <input
               className="date-input short"
-              placeholder="일"
+              placeholder={t.day}
               inputMode="numeric"
               value={partnerBirth.d}
               onChange={(e) => setPartnerBirth({ ...partnerBirth, d: e.target.value })}
@@ -263,19 +352,20 @@ export default function App() {
           {error && <p className="error-text">{error}</p>}
 
           <button className="cta" disabled={!canSubmitPartner || loading} onClick={submitPartner}>
-            {loading ? "계산 중..." : "궁합 결과 보기"}
+            {loading ? t.calculating : t.seeCompat}
           </button>
         </div>
       )}
 
       {screen === "compat-result" && compat && (
         <div className="screen">
-          <button className="back" onClick={() => setScreen("result")}>
-            ← 내 결과로
-          </button>
+          <div className="screen-top-row">
+            <button className="back" onClick={() => setScreen("result")}>{t.backResult}</button>
+            <LangToggle lang={lang} setLang={setLang} />
+          </div>
 
           <div className="result-head">
-            <span className="result-group">궁합 관계</span>
+            <span className="result-group">{t.compatGroup}</span>
             <h2 className="result-name">
               {compat.relationName} <span className="result-hanja">{compat.relationHanja}</span>
             </h2>
@@ -283,36 +373,43 @@ export default function App() {
           </div>
 
           <div className="char-pair">
-            <CharacterSlot label="나" />
+            <CharacterSlot label={t.me} />
             <span className="char-pair-x">×</span>
-            <CharacterSlot label="상대" />
+            <CharacterSlot label={t.partner} />
           </div>
 
-          <Section n="01" title="관계 한줄평">{compat.oneLiner}</Section>
+          <Section n="01" title={t.oneLiner}>{compat.oneLiner}</Section>
 
           <div className={`locked-wrap ${unlocked ? "open" : ""}`}>
-            <Section n="02" title="끌림과 관계의 시작">
+            <Section n="02" title={t.startTitle}>
               {compat.start || "두 사람이 서로에게 끌리는 이유와 관계가 시작되는 방식."}
             </Section>
-            <Section n="03" title="연인으로 만나면">
+            <Section n="03" title={t.romanceTitle}>
               {compat.romance || "연애할 때의 분위기와 애정 표현 방식."}
             </Section>
-            <Section n="04" title="갈등과 관계의 약점">
+            <Section n="04" title={t.conflictTitle}>
               {compat.conflict || "어디서 부딪히는지, 멀어질 때의 패턴."}
             </Section>
-            <Section n="05" title="이 관계가 남기는 것">
+            <Section n="05" title={t.legacyTitle}>
               {compat.legacy || "서로에게 남기는 영향과 오래가기 위한 조건."}
             </Section>
 
             {!unlocked && (
               <div className="lock-overlay">
-                <p className="lock-text">전체 궁합 리포트는 1,900원에 확인할 수 있어요</p>
+                <p className="lock-text">{t.lockText}</p>
                 <button className="cta small" onClick={() => setUnlocked(true)}>
-                  리포트 잠금 해제
+                  {t.unlock}
                 </button>
               </div>
             )}
           </div>
+
+          {unlocked && (
+            <ShareButton
+              label={t.share}
+              onClick={() => shareResult("숙요점 궁합", `우리는 ${compat.relationName}(${compat.relationHanja}) 관계래요 — ${compat.oneLiner}`, t, setToast)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -334,6 +431,8 @@ const css = `
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif;
     min-height: 100vh;
+    overflow-x: hidden;
+    width: 100%;
   }
   @media (min-width: 480px) {
     .app {
@@ -351,12 +450,14 @@ const css = `
   }
   .screen {
     max-width: 420px;
+    width: 100%;
     margin: 0 auto;
-    padding: 32px 22px 48px;
+    padding: 44px 22px 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    box-sizing: border-box;
   }
   .mark {
     width: 48px; height: 48px;
@@ -397,12 +498,31 @@ const css = `
   .faq-q { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
   .faq-a { font-size: 13.5px; line-height: 1.75; color: var(--muted); }
 
-  .back { align-self: flex-start; background: none; border: none; color: var(--muted); font-size: 13px; margin-bottom: 20px; cursor: pointer; }
+  .back { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; }
+  .screen-top-row { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+
+  .lang-toggle { display: flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .lang-toggle button { border: none; background: #fff; color: var(--muted); font-size: 11px; font-weight: 700; padding: 5px 10px; cursor: pointer; }
+  .lang-toggle button.active { background: var(--pink); color: #fff; }
+  .landing-lang-wrap { align-self: flex-end; margin-bottom: 8px; }
+
+  .share-btn {
+    background: #fff; border: 1.5px solid var(--border); color: var(--ink);
+    font-size: 13px; font-weight: 700; padding: 11px 18px; border-radius: 10px;
+    cursor: pointer; margin-top: 14px; width: 100%;
+  }
+
+  .toast {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff; font-size: 12.5px;
+    padding: 9px 16px; border-radius: 999px; z-index: 50;
+  }
+
   .page-title { font-size: 21px; font-weight: 800; margin-bottom: 6px; }
   .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
 
   .date-row { display: flex; gap: 8px; width: 100%; margin-bottom: 8px; }
-  .date-input { flex: 2; background: #fafafa; border: 1px solid var(--border); color: var(--ink); padding: 13px 10px; font-size: 16px; border-radius: 8px; text-align: center; }
+  .date-input { flex: 2; min-width: 0; width: 100%; background: #fafafa; border: 1px solid var(--border); color: var(--ink); padding: 13px 8px; font-size: 16px; border-radius: 8px; text-align: center; }
   .date-input.short { flex: 1; }
   .error-text { color: var(--pink); font-size: 12.5px; margin: 8px 0 16px; }
 
@@ -434,6 +554,10 @@ const css = `
   .section-body { font-size: 13.5px; line-height: 1.8; color: #444; }
 
   .placeholder-note { font-size: 13px; line-height: 1.8; color: var(--muted); background: #fafafa; border: 1px solid var(--border); padding: 16px; border-radius: 10px; margin-bottom: 8px; text-align: left; }
+
+  .hook-box { width: 100%; background: var(--pink-soft); border-radius: 12px; padding: 18px; margin: 6px 0 24px; text-align: center; }
+  .hook-text { font-size: 14px; font-weight: 700; line-height: 1.6; margin-bottom: 12px; }
+  .cta.small-full { width: 100%; padding: 11px; font-size: 13px; margin-top: 0; }
 
   .locked-wrap { position: relative; width: 100%; }
   .locked-wrap:not(.open) .section:nth-child(n+2) { filter: blur(5px); user-select: none; pointer-events: none; }
