@@ -18,7 +18,7 @@ npm run build
 
 ## 백엔드 연결
 
-`src/App.jsx` 상단의 `API_BASE_URL`을 실제 백엔드 주소로 맞춰주세요.
+빌드 시 `VITE_API_BASE_URL` 환경변수로 백엔드 주소를 지정할 수 있습니다.
 지금은 `https://sukyo-backend.onrender.com`으로 설정되어 있습니다.
 
 ## Render 배포 (Static Site)

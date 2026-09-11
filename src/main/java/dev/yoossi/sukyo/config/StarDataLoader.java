@@ -162,17 +162,48 @@ public class StarDataLoader implements CommandLineRunner {
             "왜 진수는 상대가 편해질수록 자기 수고는 더 안 보이게 만들까요?")
     );
 
+    private static final List<String> KEYWORDS = List.of(
+        "취향|조화|섬세함",
+        "원칙|공정함|소신",
+        "목표지향|현실감각|끈기",
+        "신중함|집중력|깊은 애정",
+        "눈치|적응력|속마음",
+        "몰입|승부욕|책임감",
+        "자유|모험심|솔직함",
+        "포부|장기적 안목|자기성장",
+        "성실함|신뢰|꾸준함",
+        "독창성|탐구심|독립성",
+        "개성|호기심|변화",
+        "추진력|열정|존재감",
+        "다정함|돌봄|헌신",
+        "품위|낭만|예의",
+        "문제해결|순발력|실행력",
+        "결단력|배짱|직진",
+        "미감|자기관리|완성도",
+        "지속력|안정감|신중함",
+        "언어감각|분석력|전략",
+        "도전|재치|실험정신",
+        "논리|정리력|실용성",
+        "공감|유연함|친화력",
+        "감수성|기억력|보호본능",
+        "소신|전문성|자존심",
+        "표현력|존재감|나눔",
+        "이상|완성도|배움",
+        "세심함|관찰력|조율"
+    );
+
     @Override
     public void run(String... args) {
-        starRepository.deleteAll();
+        // Keep stable database IDs when refreshing built-in content.
         for (Row r : ROWS) {
-            Star star = new Star();
+            Star star = starRepository.findBySequence(r.seq()).orElseGet(Star::new);
             star.setSequence(r.seq());
             star.setKoreanName(r.kr());
             star.setHanja(r.hanja());
             star.setElement(r.elem());
             star.setAnimal(r.animal());
             star.setDirectionGroup(r.group());
+            star.setKeyword(KEYWORDS.get(r.seq()));
             star.setCatchPhrase(r.catchPhrase());
             star.setTemperament(r.temperament());
             star.setLove(r.love());

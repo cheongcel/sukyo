@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 27수(二十七宿) 중 하나. sequence는 0~26이며, 달의 황경 구간(360/27도씩)에 대응한다.
+ * 27수(二十七宿) 중 하나. sequence는 각수부터 진수까지의 순환 순서(0~26)다.
  * DIVY 프로젝트처럼 JPA 엔티티로 모델링해 관계형 데이터로 관리한다.
  */
 @Entity
@@ -23,7 +23,7 @@ public class Star {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Integer sequence; // 0~26, 황경 구간 인덱스
+    private Integer sequence; // 0~26, 각수부터 진수까지의 순서
 
     @Column(nullable = false)
     private String koreanName;
