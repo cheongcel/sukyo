@@ -105,8 +105,8 @@ async function fetchStar(y, m, d) {
 
 async function fetchCompatibility(me, partner) {
   return requestResult("/api/sukyo/compatibility", {
-      me: { year: Number(me.y), month: Number(me.m), day: Number(me.d) },
-      partner: { year: Number(partner.y), month: Number(partner.m), day: Number(partner.d) },
+    me: { year: Number(me.y), month: Number(me.m), day: Number(me.d) },
+    partner: { year: Number(partner.y), month: Number(partner.m), day: Number(partner.d) },
   });
 }
 
@@ -183,6 +183,16 @@ function Section({ n, title, children }) {
   );
 }
 
+/* 밑줄 스타일 인풋 + 항상 보이는 년/월/일 라벨 */
+function DateField({ label, wide, ...props }) {
+  return (
+    <div className={`date-field ${wide ? "wide" : ""}`}>
+      <input className="date-input" {...props} />
+      <span className="date-field-label">{label}</span>
+    </div>
+  );
+}
+
 function isValidBirth({ y, m, d }) {
   if (![y, m, d].every(value => /^\d+$/.test(String(value)))) return false;
   const year = Number(y), month = Number(m), day = Number(d);
@@ -230,7 +240,6 @@ export default function App() {
     try {
       const data = await fetchCompatibility(birth, partnerBirth);
       setCompat(data);
-
       setScreen("compat-result");
     } catch (e) {
       setError(t.errCompat);
@@ -299,25 +308,26 @@ export default function App() {
           <p className="page-sub">{t.birthSub}</p>
 
           <fieldset className="date-row" disabled={loading}>
-            <input
-              className="date-input"
-              placeholder={t.year}
+            <DateField
+              label={t.year}
+              wide
+              placeholder="1996"
               aria-label={t.year}
               inputMode="numeric"
               value={birth.y}
               onChange={(e) => setBirth({ ...birth, y: e.target.value })}
             />
-            <input
-              className="date-input short"
-              placeholder={t.month}
+            <DateField
+              label={t.month}
+              placeholder="3"
               aria-label={t.month}
               inputMode="numeric"
               value={birth.m}
               onChange={(e) => setBirth({ ...birth, m: e.target.value })}
             />
-            <input
-              className="date-input short"
-              placeholder={t.day}
+            <DateField
+              label={t.day}
+              placeholder="14"
               aria-label={t.day}
               inputMode="numeric"
               value={birth.d}
@@ -355,6 +365,7 @@ export default function App() {
               {star.keywords.map(keyword => <li key={keyword}>#{keyword}</li>)}
             </ul>
           )}
+
           <CharacterSlot label={`${star.koreanName} ${t.charSlot}`} />
 
           <p className="catchphrase">“{star.catchPhrase}”</p>
@@ -390,25 +401,26 @@ export default function App() {
           <p className="page-sub">{t.partnerSub}</p>
 
           <fieldset className="date-row" disabled={loading}>
-            <input
-              className="date-input"
-              placeholder={t.year}
+            <DateField
+              label={t.year}
+              wide
+              placeholder="1996"
               aria-label={t.year}
               inputMode="numeric"
               value={partnerBirth.y}
               onChange={(e) => setPartnerBirth({ ...partnerBirth, y: e.target.value })}
             />
-            <input
-              className="date-input short"
-              placeholder={t.month}
+            <DateField
+              label={t.month}
+              placeholder="3"
               aria-label={t.month}
               inputMode="numeric"
               value={partnerBirth.m}
               onChange={(e) => setPartnerBirth({ ...partnerBirth, m: e.target.value })}
             />
-            <input
-              className="date-input short"
-              placeholder={t.day}
+            <DateField
+              label={t.day}
+              placeholder="14"
               aria-label={t.day}
               inputMode="numeric"
               value={partnerBirth.d}
@@ -573,6 +585,7 @@ const css = `
   .faq-a { font-size: 13.5px; line-height: 1.75; color: var(--muted); }
 
   .back { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; }
+  .back:disabled { opacity: 0.4; cursor: not-allowed; }
   .screen-top-row { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 
   .lang-toggle { display: flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
@@ -595,15 +608,25 @@ const css = `
   .page-title { font-size: 21px; font-weight: 800; margin-bottom: 6px; }
   .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
 
-  .date-row { display: flex; gap: 8px; width: 100%; margin: 0 0 8px; padding: 0; border: 0; min-width: 0; }
+  .date-row { display: flex; gap: 14px; width: 100%; margin: 0 0 8px; padding: 0; border: 0; align-items: flex-end; }
+  .date-field { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .date-field.wide { flex: 1.6; }
+  .date-input {
+    width: 100%; min-width: 0; background: transparent;
+    border: none; border-bottom: 1.5px solid #ddd;
+    color: var(--ink); padding: 10px 4px; font-size: 18px; font-weight: 700;
+    border-radius: 0; text-align: center;
+  }
+  .date-input:focus { outline: none; border-bottom-color: var(--pink); }
+  .date-field-label { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+
   .loading-notice { width: 100%; background: var(--pink-soft); border-radius: 12px; padding: 20px 16px; margin: 8px 0 16px; font-size: 14px; }
   .loading-notice strong { display: block; }
   .loading-notice p { color: #555; font-size: 13px; line-height: 1.7; margin: 8px 0 0; word-break: keep-all; }
   .loading-spinner { display: block; width: 26px; height: 26px; margin: 0 auto 12px; border: 3px solid #f3bfd0; border-top-color: var(--pink); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .loading-spinner { animation: none; } }
-  .date-input { flex: 2; min-width: 0; width: 100%; background: #fafafa; border: 1px solid var(--border); color: var(--ink); padding: 13px 8px; font-size: 16px; border-radius: 8px; text-align: center; }
-  .date-input.short { flex: 1; }
+
   .error-text { color: var(--pink); font-size: 12.5px; margin: 8px 0 16px; }
 
   .result-head { margin-bottom: 16px; }
